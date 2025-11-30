@@ -4,22 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>BTCPay.Creditcard – Bitcoin Payment Gateways & Card Integration</title>
-  <meta name="description" content="How Bitcoin payment gateways interact with card networks: merchant settlement, BTC-to-fiat conversion, fees and compatibility with crypto-linked credit cards." />
+  <title>BTCPay.Creditcard – Bitcoin Payment Gateways & Merchant Flows</title>
+  <meta name="description" content="Independent explainer of BTC payment gateways and merchant-side processing: how bitcoin invoices, conversion, settlement and card rails interact – and what to consider before accepting or routing BTC payments." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://btcpay.creditcard/" />
 
   <!-- Open Graph -->
-  <meta property="og:title" content="BTCPay.Creditcard – BTC Gateways & Card Payments Explained" />
-  <meta property="og:description" content="Independent explanation of how Bitcoin gateways route transactions, manage conversion and connect to existing card rails." />
+  <meta property="og:title" content="BTCPay.Creditcard – Bitcoin Payment Gateways Explained" />
+  <meta property="og:description" content="How BTC payment gateways generate invoices, route on-chain and Lightning payments, and interact with card and fiat settlement for merchants." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://btcpay.creditcard/" />
   <meta property="og:image" content="https://choose.creditcard/preview.png?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=og_image" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="BTCPay.Creditcard – BTC Gateways & Card Payments Explained" />
-  <meta name="twitter:description" content="Learn how Bitcoin payment gateways settle transactions and interact with crypto-linked credit cards." />
+  <meta name="twitter:title" content="BTCPay.Creditcard – BTC Gateways & Merchant Flows" />
+  <meta name="twitter:description" content="Neutral overview of bitcoin payment gateways and how BTC invoices connect to everyday checkout and settlement flows." />
   <meta name="twitter:image" content="https://choose.creditcard/preview.png?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=twitter_image" />
 
   <!-- GA4 -->
@@ -31,27 +31,26 @@
     gtag('config', 'G-64FE63JQ3H');
   </script>
 
-  <!-- Tailwind -->
+  <!-- Tailwind for utility classes -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Shared CSS -->
+  <!-- Shared minisite styles -->
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body class="bg-slate-950 text-slate-100">
-
   <header class="site-header">
     <div class="nav-inner max-w-6xl">
       <div class="brand">
         <div class="cc-logo">CC</div>
         <div class="brand-text">
           <div class="brand-title">BTCPay.Creditcard</div>
-          <div class="brand-subtitle">Bitcoin Gateways & Card Payment Flows</div>
+          <div class="brand-subtitle">Bitcoin Payment Gateways Explained</div>
         </div>
       </div>
-      <nav class="nav-links">
+      <nav class="nav-links" aria-label="Page navigation">
         <a href="#overview">Overview</a>
-        <a href="#mechanics">How It Works</a>
-        <a href="#compare">Compare</a>
+        <a href="#flow">How It Works</a>
+        <a href="#risk">Risk &amp; Settlement</a>
       </nav>
     </div>
   </header>
@@ -67,163 +66,217 @@
     <!-- Hero -->
     <section class="hero">
       <div class="hero-content">
-        <h1>How Bitcoin Payment Gateways Connect to Card Networks</h1>
+        <h1>How Bitcoin Payment Gateways Connect to Everyday Checkout</h1>
         <p class="hero-lead">
-          Bitcoin payment gateways make it possible for merchants to accept BTC while still settling in fiat. This page explains how BTC flows through the system, how conversion works, and how these processes align with crypto-linked credit cards.
+          BTC payment gateways sit between customers, wallets and merchants. This page explains how bitcoin invoices,
+          price locking, conversion and settlement work – and how this can coexist with cards, terminals and fiat
+          accounting.
         </p>
-        <a class="cta" href="https://choose.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=hero_cta">
-          Compare crypto-friendly credit cards
+        <a class="cta" href="https://choose.creditcard/crypto/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=hero_cta">
+          Explore Crypto &amp; Web3 card options
         </a>
       </div>
     </section>
 
-    <!-- Content Sections -->
+    <!-- Overview -->
     <section id="overview" class="section">
-      <h2>What Is a Bitcoin Payment Gateway?</h2>
-      <p>Bitcoin payment gateways allow merchants to accept BTC from customers while still receiving local currency in their bank account. They bridge the gap between crypto payments, market pricing engines and traditional settlement infrastructure.</p>
-      <p>Instead of merchants managing wallets or exchange risk, the gateway handles rate quotes, invoicing, BTC conversion and settlement. For consumers, these systems often work in parallel with crypto-linked cards that convert BTC at the moment of purchase.</p>
+      <h2>What Is a BTC Payment Gateway?</h2>
+      <p>
+        A bitcoin payment gateway is a service that lets merchants accept BTC while still running a familiar checkout
+        flow. It generates <strong>BTC invoices</strong>, tracks incoming payments on-chain or via Lightning, and
+        optionally converts funds into fiat so the merchant does not need to hold bitcoin directly.
+      </p>
+      <p>
+        For the customer, the experience is often just scanning a QR code or clicking a wallet link. For the merchant,
+        the gateway aims to hide the complexity of addresses, confirmations and exchange rates behind a simple
+        “invoice paid / not paid” status.
+      </p>
     </section>
 
-    <section id="mechanics" class="section">
-      <h2>How BTCPay Transactions Move Through the System</h2>
-      <p>When a customer pays in Bitcoin, the gateway generates a payment request with a fixed-time price quote. Once the BTC reaches the gateway’s address, it is consolidated and exchanged for fiat through the provider’s liquidity partners.</p>
-      <p>The merchant then receives a normal bank transfer. This model mirrors aspects of crypto credit-card payments, where BTC is sold behind the scenes and converted into the fiat needed to settle over traditional card rails.</p>
+    <!-- Flow -->
+    <section id="flow" class="section">
+      <h2>From Invoice to Settlement – Typical BTCPay Flow</h2>
+      <p>
+        Implementations differ, but many BTC payment flows share a similar structure:
+      </p>
+      <ul>
+        <li>
+          <strong>1. Price quote:</strong> the checkout total is converted from the store currency (e.g. USD, EUR)
+          into BTC at a quoted exchange rate, often with a short time lock.
+        </li>
+        <li>
+          <strong>2. Invoice generation:</strong> the gateway creates a payment request – on-chain address,
+          Lightning invoice or both – and displays it to the customer.
+        </li>
+        <li>
+          <strong>3. Payment detection:</strong> the gateway watches the relevant network(s) to detect if the required
+          amount has arrived within the time window.
+        </li>
+        <li>
+          <strong>4. Confirmation:</strong> once the payment is considered final (instant on Lightning, or after a
+          certain number of on-chain confirmations), the order is marked as paid.
+        </li>
+        <li>
+          <strong>5. Settlement:</strong> funds are either settled to the merchant in BTC, or converted to fiat and
+          paid out to a bank account, depending on the merchant’s preferences.
+        </li>
+      </ul>
+      <p>
+        Some providers integrate directly with point-of-sale terminals and online storefronts, letting BTC coexist
+        with cards and local wallets as just another payment option at checkout.
+      </p>
     </section>
 
+    <!-- Risk & settlement -->
+    <section id="risk" class="section">
+      <h2>Volatility, Conversion &amp; Accounting Considerations</h2>
+      <p>
+        Bitcoin gateways have to deal with <strong>price volatility</strong>. To handle this, they usually:
+      </p>
+      <ul>
+        <li>Lock a BTC price for a short window when the invoice is created.</li>
+        <li>Apply spreads or fees on the exchange rate used for conversions.</li>
+        <li>Offer automatic conversion to fiat for merchants who prefer not to hold BTC.</li>
+      </ul>
+      <p>
+        From a merchant perspective, key questions include:
+      </p>
+      <ul>
+        <li>
+          <strong>How settlement works:</strong> in BTC, in fiat, or a mix – and which bank accounts or wallets are used.
+        </li>
+        <li>
+          <strong>Fees &amp; spreads:</strong> the total cost vs. card processing for similar transactions.
+        </li>
+        <li>
+          <strong>Invoice records:</strong> whether the gateway provides clear reporting for tax and accounting.
+        </li>
+        <li>
+          <strong>Chargebacks &amp; disputes:</strong> BTC payments are generally irreversible, unlike many card
+          chargebacks.
+        </li>
+      </ul>
+      <p>
+        BTC acceptance can make most sense for merchants with crypto-native customers or specific reasons to settle
+        in bitcoin – but it still sits alongside card rails and traditional processing for most day-to-day usage.
+      </p>
+    </section>
+
+    <!-- Comparison block -->
     <section class="section">
-      <h2>Fees, Rates and Conversion Timing</h2>
-      <p>Gateways typically charge a combination of processing fees and spreads on BTC conversion. Pricing may shift depending on the size of the transaction, volatility at the time of payment and network congestion fees.</p>
-      <p>Some gateways lock exchange rates for a short window, while others convert immediately once a transaction is confirmed on-chain. The timing can influence the effective rate paid by the merchant or user.</p>
-    </section>
-
-    <section class="section">
-      <h2>Rewards, Rebates and Platform Incentives</h2>
-      <p>Unlike crypto credit cards, Bitcoin payment gateways usually do not provide direct rewards. However, certain providers offer fee discounts or rebates for high-volume merchants or users who stake a native platform token.</p>
-      <p>These structures are separate from credit-card rewards but can interact indirectly when gateways and crypto-linked cards are used within the same ecosystem.</p>
-    </section>
-
-    <section class="section">
-      <h2>Compliance, Settlement and Recordkeeping</h2>
-      <p>Because BTC payments may count as taxable disposals or capital gains events, robust reporting tools are essential. Gateways often provide detailed settlement statements, transaction histories and downloadable logs for accounting purposes.</p>
-      <p>For businesses using both Bitcoin gateways and crypto-linked credit cards, clear reporting helps reconcile BTC inflows, fiat settlements and conversion events across systems.</p>
-    </section>
-
-    <!-- Comparison -->
-    <section id="compare" class="section">
-      <h2>Compare Gateway & Card-Based Crypto Flows</h2>
+      <h2>BTC Gateways vs. Traditional Card Processing</h2>
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
               <th>Aspect</th>
-              <th>Gateway Model</th>
-              <th>Card Model</th>
+              <th>BTC Gateway</th>
+              <th>Card Processor</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Conversion Timing</td>
-              <td>At invoice confirmation or settlement window</td>
-              <td>Instant or preloaded BTC-to-fiat sale</td>
+              <td>Payment finality</td>
+              <td>On-chain / Lightning; typically irreversible</td>
+              <td>Card network rules; chargebacks possible</td>
             </tr>
             <tr>
-              <td>Fees &amp; Spreads</td>
-              <td>Processing fees + exchange spreads</td>
-              <td>Conversion spread + potential FX fees</td>
+              <td>Currency risk</td>
+              <td>BTC volatility unless converted to fiat</td>
+              <td>Fiat-based, depending on FX arrangements</td>
             </tr>
             <tr>
-              <td>Merchant View</td>
-              <td>Receives fiat directly</td>
-              <td>Receives normal card settlement</td>
+              <td>Customer UX</td>
+              <td>Wallet, QR code, crypto-native</td>
+              <td>Card, terminal, digital wallet (Apple/Google Pay)</td>
             </tr>
             <tr>
-              <td>User View</td>
-              <td>Pays in BTC directly from wallet</td>
-              <td>Spends via card; BTC sold behind the scenes</td>
+              <td>Fees</td>
+              <td>Network fees + gateway spreads/charges</td>
+              <td>Interchange, scheme fees, processor margin</td>
             </tr>
             <tr>
-              <td>Reporting</td>
-              <td>Downloadable settlement and reconciliation files</td>
-              <td>Card statements + crypto conversion logs</td>
+              <td>Who it suits</td>
+              <td>Crypto-heavy customers or merchants</td>
+              <td>General retail audience</td>
             </tr>
           </tbody>
         </table>
       </div>
-
       <p class="small">
-        For crypto card comparisons, visit
+        For broader comparisons across card-based solutions, use
         <a href="https://choose.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=comparison_section">
           Choose.Creditcard
-        </a>.
+        </a> as a neutral starting point.
       </p>
     </section>
 
-    <!-- Cluster -->
+    <!-- Cluster links -->
     <section class="section">
-      <h2>Explore Related Payment Technologies</h2>
+      <h2>Explore Related Bitcoin &amp; Crypto Payment Topics</h2>
       <div class="cluster-grid">
         <a class="cluster-card" href="https://bitcoinpay.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=cluster_bitcoinpay">
           <h3>BitcoinPay.Creditcard</h3>
-          <p>End-to-end look at BTC-to-fiat card payment flows.</p>
+          <p>How BTC-denominated card and payment flows work for consumers.</p>
         </a>
-        <a class="cluster-card" href="https://btcpay.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=cluster_btcpay">
-          <h3>BTCPay.Creditcard</h3>
-          <p>How Bitcoin payment gateways quote, convert and settle.</p>
+        <a class="cluster-card" href="https://cryptopay.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=cluster_cryptopay">
+          <h3>CryptoPay.Creditcard</h3>
+          <p>Crypto-linked cards that convert coins to fiat at the terminal.</p>
+        </a>
+        <a class="cluster-card" href="https://bitpay.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=cluster_bitpay">
+          <h3>BitPay.Creditcard</h3>
+          <p>Brand-based example of BTC and crypto payment infrastructure.</p>
         </a>
         <a class="cluster-card" href="https://tokens.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=cluster_tokens">
           <h3>Tokens.Creditcard</h3>
-          <p>Token-based incentives for crypto ecosystems.</p>
+          <p>Token rewards, governance tokens and Web3 incentive structures.</p>
         </a>
-        <a class="cluster-card" href="https://defipay.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=cluster_defipay">
-          <h3>DefiPay.Creditcard</h3>
-          <p>Spending paths that use DeFi liquidity and yield engines.</p>
-        </a>
-        <a class="cluster-card" href="https://virtualpay.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=cluster_virtualpay">
-          <h3>VirtualPay.Creditcard</h3>
-          <p>Virtual card numbers and secure wallet-first payments.</p>
+        <a class="cluster-card" href="https://chainpay.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=cluster_chainpay">
+          <h3>ChainPay.Creditcard</h3>
+          <p>Multi-rail payment routing across crypto and traditional rails.</p>
         </a>
       </div>
     </section>
 
-    <!-- CreditCard Collection -->
+    <!-- Collection / hub snippet -->
     <section class="section">
       <h2>Part of The CreditCard Collection</h2>
       <p class="small">
-        BTCPay.Creditcard is part of <strong>The CreditCard Collection</strong>, a network of focused minisites by ronarn AS. Each page explains one concept clearly and points you toward independent comparison tools.
+        BTCPay.Creditcard is part of <strong>The CreditCard Collection</strong> – a network of focused microsites by
+        ronarn AS. Each page explains one part of the modern payments stack and connects to neutral comparison hubs.
       </p>
       <p class="small">
-        We do not issue cards or operate payment gateways. Our role is informational only, summarizing public documentation and outlining trade-offs in neutral language.
-      </p>
-      <p class="small">
-        None of this is financial, legal or tax advice. Bitcoin-related regulations vary by region, and readers should consult official sources when evaluating any provider.
+        We do not operate BTC gateways or issue cards. This page summarises typical patterns in public documentation.
+        It is not technical advice, legal advice or a recommendation to accept BTC.
       </p>
 
-      <!-- REQUIRED SNIPPET (Crypto hub) -->
       <div class="hub-link">
         <a href="https://choose.creditcard/crypto/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=minisite_to_hub"
-           class="text-sm text-slate-600 hover:text-slate-900">
-          Learn more at the Crypto &amp; Web3 hub
+           class="text-sm text-slate-400 hover:text-slate-200">
+          Learn more in the Crypto &amp; Web3 Cards hub on Choose.Creditcard
         </a>
       </div>
     </section>
 
     <!-- Bottom CTA -->
     <section class="section">
-      <h2>Compare Crypto-Compatible Cards</h2>
+      <h2>Compare Crypto &amp; Traditional Card Setups</h2>
       <p class="small">
-        After learning how Bitcoin payment gateways operate, visit the main comparison hub to review cards that support BTC spending, on-ramp/off-ramp integrations or stablecoin functionality.
+        Use BTCPay.Creditcard to understand merchant-side BTC payment flows, then visit the Crypto hub and main
+        Choose.Creditcard site to compare how crypto-oriented cards and gateways sit alongside traditional card and
+        bank options.
       </p>
-      <a class="cta" href="https://choose.creditcard/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=bottom_cta">
-        Go to Choose.Creditcard
+      <a class="cta" href="https://choose.creditcard/crypto/?utm_source=btcpay.creditcard&utm_medium=referral&utm_campaign=bottom_cta">
+        Go to Crypto &amp; Web3 Cards hub
       </a>
     </section>
-
   </main>
 
   <footer class="mini-footer">
     <p class="mini-footer-main">© 2025 The CreditCard Collection — ronarn AS</p>
-    <p class="mini-footer-contact">Contact: <a href="mailto:support@cc.creditcard">support@cc.creditcard</a></p>
+    <p class="mini-footer-contact">
+      Contact: <a href="mailto:support@cc.creditcard">support@cc.creditcard</a>
+    </p>
   </footer>
-
 </body>
 </html>
